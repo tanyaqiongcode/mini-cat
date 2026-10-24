@@ -1,6 +1,6 @@
 # term-engine.js 来源与重建
 
-`js/term-engine.js` 为**打包产物**，源代码来自本维护者自己的 [bilingual-term-extract](https://github.com/tanyaqiong31029) 项目（MIT，统计式双语术语提取：n-gram 候选 + C-value/PMI + Dice 共现投票 + 验证器）。
+`js/term-engine.js` 为**打包产物**，源代码来自本维护者自己的 [bilingual-term-extract](https://github.com/tanyaqiongcode) 项目（MIT，统计式双语术语提取：n-gram 候选 + C-value/PMI + Dice 共现投票 + 验证器）。
 
 - **打包脚本**：`scripts/bundle-term-engine.cjs`
 - **重建方法**：`node scripts/bundle-term-engine.cjs <bilingual-term-extract 源码目录>`
