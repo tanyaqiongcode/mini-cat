@@ -1,7 +1,7 @@
 /* Vendored bilingual-term-extract statistical engine.
 MIT License
 
-Copyright (c) 2026 tanyaqiong31029
+Copyright (c) 2026 tanyaqiongcode
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ const factories={}, cache={}, process={env:{}};
 factories["./util.js"]=function(require,module,exports){
 'use strict';
 /* Bilingual-Term-Extract —— 通用工具
- * charClass / weightedLen / isCJKText 适配自 multi-align（MIT License, tanyaqiong31029）
+ * charClass / weightedLen / isCJKText 适配自 multi-align（MIT License, tanyaqiongcode）
  */
 
 function escapeXml(s) {
