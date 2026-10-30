@@ -1,17 +1,18 @@
 {
   "name": "mini-cat",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "private": true,
   "description": "轻量网页版翻译记忆 CAT 工具（零运行时依赖；linkedom 和 Playwright 仅测试环境使用）",
   "scripts": {
-    "test": "node tests/core.test.js && node tests/msoffice.test.js && node tests/diff.test.js && node tests/tracked.test.js && node tests/officewrite.test.js && node tests/restore.test.js && node tests/webref.test.js && node tests/revision-plan.test.js && node tests/richtext.test.js && node tests/restore-format.test.js && node tests/officewrite-format.test.js && node tests/term-candidates.test.js && node tests/segment-ops.test.js && node tests/style-rules.test.js && node tests/saveconflict.test.js && node tests/io.test.js && node tests/bench.js",
+    "test": "c8 --lines 80 --functions 70 npm run test:raw",
     "test:browser": "node tests/browser.test.js",
-    "test:coverage": "c8 --reporter=text npm test"
+    "test:coverage": "c8 --lines 80 --functions 70 --reporter=text npm run test:raw",
+    "test:raw": "node tests/core.test.js && node tests/msoffice.test.js && node tests/diff.test.js && node tests/tracked.test.js && node tests/officewrite.test.js && node tests/restore.test.js && node tests/webref.test.js && node tests/revision-plan.test.js && node tests/richtext.test.js && node tests/restore-format.test.js && node tests/officewrite-format.test.js && node tests/term-candidates.test.js && node tests/segment-ops.test.js && node tests/style-rules.test.js && node tests/saveconflict.test.js && node tests/io.test.js && node tests/bench.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
+    "c8": "^10.1.3",
     "fake-indexeddb": "^6.2.5",
-    "linkedom": "^0.18.0",
-    "c8": "^10.1.0"
+    "linkedom": "^0.18.0"
   }
 }

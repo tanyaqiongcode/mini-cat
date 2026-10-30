@@ -1414,8 +1414,11 @@
           return { pairs: tus.map(tu => ({ zh: tu.src, en: tu.tgt })), note: 'TMX' };
         }
         if (/\.jsonl$/i.test(f.name)) {
-          const objs = IO.parseJSONL(text);
-          return { pairs: objs.filter(o => o.zh && o.en).map(o => ({ zh: o.zh, en: o.en })), note: 'JSONL' };
+          const { rows, errors } = IO.parseJSONLVerbose(text);
+          const good = rows.filter(o => o.zh && o.en).map(o => ({ zh: o.zh, en: o.en }));
+          const badCount = rows.length - good.length + errors.length;
+          const note = badCount > 0 ? `JSONL（成功 ${good.length}，跳过 ${badCount} 行）` : 'JSONL';
+          return { pairs: good, note };
         }
         const { header, rows, mapping } = IO.sniffBilingualTable(text);
         return { pairs: rows.map(r => ({ zh: String(r[mapping.src] || ''), en: String(r[mapping.tgt] || '') })), note: 'CSV/TSV' };

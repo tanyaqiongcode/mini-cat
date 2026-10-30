@@ -218,15 +218,24 @@
 
   /* ---------- JSONL (porcelain-china-corpus parallel format) ---------- */
 
-  function parseJSONL(text) {
-    const rows = [];
-    for (const line of text.split(/\r?\n/)) {
-      const s = line.trim();
+  function parseJSONLVerbose(text) {
+    const rows = [], errors = [];
+    const lines = text.split(/\r?\n/);
+    for (let i = 0; i < lines.length; i++) {
+      const s = lines[i].trim();
       if (!s) continue;
-      try { rows.push(JSON.parse(s)); } catch (e) { /* skip bad line */ }
+      try {
+        const obj = JSON.parse(s);
+        if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
+          errors.push({ line: i + 1, reason: '不是对象' });
+          continue;
+        }
+        rows.push(obj);
+      } catch (e) { errors.push({ line: i + 1, reason: 'JSON 解析失败' }); }
     }
-    return rows;
+    return { rows, errors };
   }
+  function parseJSONL(text) { return parseJSONLVerbose(text).rows; }
 
   // Map corpus JSONL {id, zh, en, chapter, ...} → TM rows
   function jsonlToTMRows(objects, project) {
@@ -384,7 +393,7 @@
   }
 
   const IO = {
-    readAsText, parseDelimited, buildDelimited, sniffBilingualTable, mapBilingualHeader, sanitizeBackup,
+    readAsText, parseDelimited, buildDelimited, sniffBilingualTable, mapBilingualHeader, parseJSONLVerbose, sanitizeBackup, parseJSONLVerbose,
     parseTMX, buildTMX, parseTBX, buildTBX, parseJSONL, jsonlToTMRows, alignPairTexts, download
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = IO;
