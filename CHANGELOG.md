@@ -1,5 +1,14 @@
 # 更新日志
 
+## v1.12.0（2026-09-29）
+
+**代码质量（审查项）**
+- **抽离 js/save-service.js**：保存队列 + 版本 CAS + 冲突检测 + 防抖从 app.js 抽离为独立模块（13 项 Node 测试，fake-indexeddb）
+- **多标签自动化浏览器测试**：Playwright 双页面冲突场景（保存→冲突→强制覆盖）
+- **部署 SHA 固定**：deploy.yml checkout 固定到 workflow_run.head_sha
+- **JSONL 导入错误报告**：parseJSONLVerbose 返回行号和原因；导入对话框显示成功/跳过计数
+- **c8 覆盖率门槛**（lines≥80%/functions≥70%），npm test 自动检查
+
 ## v1.9.0（2026-09-28）
 
 **数据安全（高优先级审查项）**

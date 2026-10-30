@@ -1,6 +1,6 @@
 {
   "name": "mini-cat",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "private": true,
   "description": "轻量网页版翻译记忆 CAT 工具（零运行时依赖；linkedom 和 Playwright 仅测试环境使用）",
   "scripts": {
@@ -12,7 +12,7 @@
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "c8": "^10.1.3",
-    "fake-indexeddb": "^6.2.5",
+    "fake-indexeddb": "^6.2.7",
     "linkedom": "^0.18.0"
   }
 }
