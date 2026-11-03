@@ -118,3 +118,15 @@ npm run test:browser       # 隔离浏览器与 IndexedDB，不读取个人浏�
 - 数据存于浏览器 IndexedDB：换电脑或换浏览器用「备份」导出 JSON，在新机器拖拽进页面即完成迁移
 
 MIT License.
+
+---
+
+## 相关项目
+
+- [paperlens](https://github.com/tanyaqiongcode/paperlens) — 论文查重 + AIGC 检测 + 联网核查 + 降重改写一站式平台（本地部署）
+- [paper-grader](https://github.com/tanyaqiongcode/paper-grader) — 中文学术论文 LLM 辅助批量批改（可插拔量规 + 置信度）
+- [Bilingual-Term-Extract](https://github.com/tanyaqiongcode/Bilingual-Term-Extract) — 平行文本双语术语提取（统计召回 + LLM 精筛，TBX 导出）
+- [nlp-learning-site](https://github.com/tanyaqiongcode/nlp-learning-site) — 面向文科生的 NLP 学习站（含 LLM 评测素养专题）
+- [multi-align](https://github.com/tanyaqiongcode/multi-align) — 多语平行语料句对齐工作台（Gale-Church，TMX 导出）
+- [weread-shelf-organizer](https://github.com/tanyaqiongcode/weread-shelf-organizer) — 微信读书书架自动整理 Skill
+- 更多作品见 [github.com/tanyaqiongcode](https://github.com/tanyaqiongcode)
