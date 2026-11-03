@@ -10,7 +10,7 @@
     "test:raw": "node tests/core.test.js && node tests/msoffice.test.js && node tests/diff.test.js && node tests/tracked.test.js && node tests/officewrite.test.js && node tests/restore.test.js && node tests/webref.test.js && node tests/revision-plan.test.js && node tests/richtext.test.js && node tests/restore-format.test.js && node tests/officewrite-format.test.js && node tests/term-candidates.test.js && node tests/segment-ops.test.js && node tests/style-rules.test.js && node tests/saveconflict.test.js && node tests/io.test.js && node tests/bench.js"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.1",
     "c8": "^10.1.3",
     "fake-indexeddb": "^6.2.7",
     "linkedom": "^0.18.0"
