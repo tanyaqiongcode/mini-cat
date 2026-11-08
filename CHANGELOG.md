@@ -1,5 +1,22 @@
 # 更新日志
 
+## v1.11.0 → v1.10.0 → MCP + Eval（feature/mcp-eval 分支）
+
+**MCP Server（零依赖 stdio JSON-RPC 2.0）**
+- `mcp/server.mjs` + `mcp/tools.js` + `mcp/store.js`：将 Mini-CAT 的 TM 查询、术语查找、句段操作、体例检查暴露为 MCP 工具
+- 7 个工具：tm_lookup / term_lookup / segment_get / segment_list / segment_submit / style_check / project_stats
+- 从 REA (morluto/rea) 借鉴的模式：教学描述（agent 读了就知道何时用）+ 结构化证据（匹配分数/来源/限制）+ 本地执行
+
+**Agent Skill**
+- `.agents/skills/mini-cat-translate/SKILL.md`：翻译工作流教学（查 TM → 查术语 → 翻译 → 查体例 → 提交）
+- 定义了 5 条铁律（不跳过查询、不跳过体例检查、术语表优先等）
+
+**Eval Benchmark（4 类场景 × 5 个任务）**
+- `eval/tasks.json`：TM 精确命中 / 术语必需 / TM 过期拒绝 / 无资源覆盖 / 综合技能
+- `eval/metrics.js`：TM 复用率、术语一致率、错误复用率、体例合规率、综合评分（加权模型）
+- `eval/runner.mjs`：validate 模式（验证 MCP + 指标）+ agent 模式（接 LLM API）
+- 28 项验证断言全过
+
 ## v1.12.0（2026-09-29）
 
 **代码质量（审查项）**

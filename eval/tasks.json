@@ -1,0 +1,79 @@
+{
+  "tasks": [
+    {
+      "id": "tm-exact-01",
+      "type": "tm_exact",
+      "description": "TM 有精确匹配——agent 应查询 TM 并复用",
+      "source": "汝窑因窑场在宋代汝州而得名。",
+      "setup": {
+        "tm": [{ "src": "汝窑因窑场在宋代汝州而得名。", "tgt": "The ware takes its name from Ruzhou, the Song administrative area in present-day Henan where it was made.", "score": 100, "origin": "V1" }],
+        "termbase": []
+      },
+      "expected": {
+        "mustCall": ["tm_lookup"],
+        "shouldReuse": true,
+        "expectedTranslation": "The ware takes its name from Ruzhou, the Song administrative area in present-day Henan where it was made."
+      }
+    },
+    {
+      "id": "term-required-01",
+      "type": "term_required",
+      "description": "源文含术语表术语——agent 应查询术语并使用规定译法",
+      "source": "青花瓷与釉里红装饰手法并存，反映了景德镇窑的工艺水平。",
+      "setup": {
+        "tm": [],
+        "termbase": [
+          { "zh": "青花瓷", "en": "blue-and-white porcelain" },
+          { "zh": "釉里红", "en": "underglaze red" },
+          { "zh": "景德镇窑", "en": "Jingdezhen kilns" }
+        ]
+      },
+      "expected": {
+        "mustCall": ["term_lookup"],
+        "shouldReuse": false,
+        "termCheck": ["blue-and-white porcelain", "underglaze red", "Jingdezhen kilns"]
+      }
+    },
+    {
+      "id": "tm-stale-01",
+      "type": "tm_stale",
+      "description": "TM 有匹配但源文已变化——agent 应查询 TM 但不复用旧译文",
+      "source": "汝窑因窑场在宋代汝州及周边地区而得名，而非仅限于汝州。",
+      "setup": {
+        "tm": [{ "src": "汝窑因窑场在宋代汝州而得名。", "tgt": "The ware takes its name from Ruzhou.", "score": 78, "origin": "V1" }],
+        "termbase": []
+      },
+      "expected": {
+        "mustCall": ["tm_lookup"],
+        "shouldReuse": false,
+        "note": "源文多了'及周边地区'和'而非仅限于汝州'——TM 匹配已过期"
+      }
+    },
+    {
+      "id": "no-resource-01",
+      "type": "no_resource",
+      "description": "无 TM/术语覆盖——agent 直接翻译（仍应调用 tm_lookup 确认无匹配）",
+      "source": "2004年2月，陕西省考古研究院对西安金代李居柔墓进行了考古发掘。",
+      "setup": { "tm": [], "termbase": [] },
+      "expected": {
+        "mustCall": ["tm_lookup"],
+        "shouldReuse": false
+      }
+    },
+    {
+      "id": "multi-skill-01",
+      "type": "term_required",
+      "description": "综合：术语 + TM 模糊匹配 + 体例检查（数字格式 + 单位空格）",
+      "source": "2004年2月，考古人员对清凉寺窑址进行了发掘，出土了高约15cm的青花瓷残片。",
+      "setup": {
+        "tm": [{ "src": "考古人员对窑址进行了发掘。", "tgt": "Archaeologists conducted excavations at the kiln site.", "score": 62, "origin": "V1" }],
+        "termbase": [{ "zh": "青花瓷", "en": "blue-and-white porcelain" }]
+      },
+      "expected": {
+        "mustCall": ["tm_lookup", "term_lookup", "style_check"],
+        "shouldReuse": false,
+        "termCheck": ["blue-and-white porcelain"]
+      }
+    }
+  ]
+}
