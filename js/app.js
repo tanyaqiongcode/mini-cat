@@ -1386,7 +1386,7 @@
                 // 自动识别：Word 修订模式携带的修订人与时间
                 const trk = (t.rowTracked || []).find(x => x.row === (firstRowTracked ? ri : ri + 1) && x.col === sniff.tgtCol);
                 const pairIndex = pairs.length;
-                const cr = (t.cellRuns || []).find(x => x.row === dataRow && x.col === sniff.tgtCol);
+                const cr = (t.cellRuns || []).find(x => x.row === (firstRowTracked ? ri : ri + 1) && x.col === sniff.tgtCol);
                 pairs.push({ zh, en, author: trk ? trk.author : undefined, date: trk ? trk.date : undefined, runs: cr ? cr.runs : undefined });
                 // 自动识别：Word 批注（导师/专家意见）
                 (t.rowComments || []).filter(rc => rc.row === (firstRowTracked ? ri : ri + 1) && rc.col === sniff.tgtCol).forEach(rc => {
@@ -1684,13 +1684,6 @@
     $('#btnMMExport').onclick = mmExport;
     $('#mmSentence').addEventListener('click', e => { const btn = e.target.closest('.mm-adopt'); if (btn) mmAdopt(btn.dataset.model); });
 
-    /* ---- MT suggestionsMMEOF
-echo "mm_code written"
-PYEOF
-wc -c /tmp/mm_code.js
-__zcode_status=$?
-if [ "$__zcode_status" -eq 0 ]; then pwd -P > '/var/folders/cx/84th5zjj7gn2k54hnd720ghw0000gn/T/zcode-ad5441bf-ab5d-415e-91e4-145aff208a2a-cwd'; fi
-exit "$__zcode_status"
     /* ---- MT suggestions: Chrome built-in on-device Translator API (no network egress of user data;
      * feature-detected, the button stays hidden where unsupported) ---- */
     let _translator = null;
