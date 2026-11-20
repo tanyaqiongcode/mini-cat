@@ -35,7 +35,6 @@ const blocks = [
 ];
 const docx = Write.buildDocx(blocks, { comments });
 fs.writeFileSync(path.join(__dirname, 'fixtures/_trk.docx'), docx);
-const names = Zip.list ? null : null;
 (async () => {
   const entries = await Zip.list(docx);
   ok(entries.includes('word/comments.xml'), 'tracked docx: comments part present');

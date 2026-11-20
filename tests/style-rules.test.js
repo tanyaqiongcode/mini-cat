@@ -6,7 +6,6 @@ function ok(cond, name) {
   if (cond) { pass++; }
   else { fail++; console.error('  ✗ FAIL:', name); }
 }
-const flat = flags => flags.map(f => f.rule + ':' + f.message).join(' || ');
 
 /* §2.1 英式拼写 */
 let r = SR.evaluate('The color of the center is striking.', 'The color of the center is striking.', []);

@@ -38,5 +38,16 @@ ok(parsed.tus[0].src === '青花瓷', `inline codes stripped from src (got ${JSO
 ok(parsed.tus[0].tgt === 'blue-and-white porcelain', `<hi> text kept, <it> dropped (got ${JSON.stringify(parsed.tus[0].tgt)})`);
 ok(parsed.tus[1].src === '釉' && parsed.tus[1].tgt === 'glaze', 'plain TU unchanged');
 
+/* --- CSV/TSV 公式注入防护（OWASP；'-' 刻意不防护，见 SECURITY.md）--- */
+const csvOut = (cell, delim) => IO.buildDelimited([[cell]], delim).replace(/^\uFEFF/, '').replace(/\r\n$/, '');
+ok(csvOut('=cmd()', ',') === "'=cmd()", `CSV: leading "=" prefixed (got ${JSON.stringify(csvOut('=cmd()', ','))})`);
+ok(csvOut('+1', ',') === "'+1", 'CSV: leading "+" prefixed');
+ok(csvOut('@x', ',') === "'@x", 'CSV: leading "@" prefixed');
+ok(csvOut('\tx', ',') === "'\tx", 'CSV: leading tab prefixed (tab itself needs no quoting inside a comma field)');
+ok(csvOut('\rx', ',').startsWith('"\''), 'CSV: leading CR prefixed and quoted');
+ok(csvOut('-dash', ',') === '-dash', "CSV: '-' deliberately NOT prefixed (dialogue dashes)");
+ok(csvOut('normal', ',') === 'normal', 'CSV: plain cell untouched');
+ok(csvOut('=a\tb', '\t').startsWith('"\''), 'TSV: leading "=" prefixed and quoted');
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

@@ -1,7 +1,7 @@
 /* Mini-CAT application: UI wiring, workspace state, matching pipeline. */
 (function () {
   'use strict';
-  const Core = window.MiniCatCore, DB = window.MiniCatDB, IO = window.MiniCatIO, Office = window.MiniCatOffice, Write = window.MiniCatWrite, Web = window.MiniCatWebRef, Diff = window.MiniCatDiff, SR = window.MiniCatStyleRules;
+  const Core = window.MiniCatCore, DB = window.MiniCatDB, IO = window.MiniCatIO, Office = window.MiniCatOffice, Write = window.MiniCatWrite, Web = window.MiniCatWebRef, Diff = window.MiniCatDiff, SR = window.MiniCatStyleRules, RevImport = window.MiniCatRevImport;
   const $ = sel => document.querySelector(sel);
   const $$ = sel => [...document.querySelectorAll(sel)];
   const esc = Core.escapeHtml;
@@ -25,14 +25,6 @@
     rev: 0,            // 当前项目记录版本号（多标签页 CAS 保护）
     pendingConflict: null
   };
-
-  const TM_BANDS = [
-    { key: 'exact', label: '100% 精确' },
-    { key: 'near', label: '95–99%' },
-    { key: 'hi', label: '75–94%' },
-    { key: 'lo', label: '50–74%' },
-    { key: 'none', label: '无匹配' }
-  ];
 
   /* ---------------- init ---------------- */
   async function init() {
@@ -1121,7 +1113,7 @@
       } else if (box.dataset.pairs) {
         rows = JSON.parse(box.dataset.pairs).map(p => ({ src: p.src, tgt: p.tgt, origin: '粘贴对齐' }));
       } else { alert('请先选择文件或生成粘贴对齐预览。'); return; }
-      const n = await addTmRows(rows, '记忆库导入');
+      await addTmRows(rows, '记忆库导入');
       $('#dlgTM').close();
       await saveProjectNow();
       await rematchAll();
@@ -1366,64 +1358,7 @@
       catch (err) { alert('恢复失败：' + err.message); }
     }
 
-    /* ---- 导入修订（审校留痕）：按中文源文匹配，文本变化即追加版本 ---- */
-    function revParsePairs(f) {
-      return Promise.resolve().then(async () => {
-        if (/\.docx$/i.test(f.name)) {
-          const parsed = await Office.docxToBlocks(await f.arrayBuffer());
-          const t = parsed.tables.find(t2 => t2.rows.length >= 1 && t2.rows[0].length >= 2);
-          if (t) {
-            // 首行若本身携带 Word 修订标记，则它是数据行而非表头
-            const firstRowTracked = (t.rowTracked || []).some(x => x.row === 0);
-            const header = firstRowTracked ? t.rows[0].map((_, i2) => '列' + (i2 + 1)) : t.rows[0].map(c2 => String(c2 || '').trim());
-            const dataRows = firstRowTracked ? t.rows : t.rows.slice(1);
-            const sniff = Office.sniffDocxTable([header, ...dataRows.slice(0, 10)]);
-            if (sniff) {
-              const pairs = [], comments = [];
-              dataRows.forEach((r, ri) => {
-                const zh = String(r[sniff.srcCol] || ''), en = String(r[sniff.tgtCol] || '');
-                if (!zh.trim() && !en.trim()) return;
-                // 自动识别：Word 修订模式携带的修订人与时间
-                const trk = (t.rowTracked || []).find(x => x.row === (firstRowTracked ? ri : ri + 1) && x.col === sniff.tgtCol);
-                const pairIndex = pairs.length;
-                const cr = (t.cellRuns || []).find(x => x.row === (firstRowTracked ? ri : ri + 1) && x.col === sniff.tgtCol);
-                pairs.push({ zh, en, author: trk ? trk.author : undefined, date: trk ? trk.date : undefined, runs: cr ? cr.runs : undefined });
-                // 自动识别：Word 批注（导师/专家意见）
-                (t.rowComments || []).filter(rc => rc.row === (firstRowTracked ? ri : ri + 1) && rc.col === sniff.tgtCol).forEach(rc => {
-                  rc.ids.forEach(id => {
-                    const c2 = (parsed.comments || []).find(cc => String(cc.id) === String(id));
-                    if (c2 && c2.text) comments.push({ pairIndex, zh, author: c2.author, date: c2.date, text: c2.text });
-                  });
-                });
-              });
-              return { pairs, comments, meta: parsed.meta, note: 'docx 表格' };
-            }
-          }
-          return { pairs: parsed.paragraphs.filter(Boolean).map(p => ({ zh: p, en: '' })), comments: [], meta: parsed.meta, note: 'docx 段落（仅原文）' };
-        }
-        if (/\.xlsx$/i.test(f.name)) {
-          const sheets = await Office.xlsxToSheets(await f.arrayBuffer());
-          const sheet = sheets.reduce((a, b) => (b.rows.length > a.rows.length ? b : a));
-          const header = (sheet.rows[0] || []).map(h => String(h || '').trim());
-          const m = IO.mapBilingualHeader(header);
-          return { pairs: sheet.rows.slice(1).map(r => ({ zh: String(r[m.src] || ''), en: m.tgt >= 0 ? String(r[m.tgt] || '') : '' })), note: 'xlsx「' + sheet.name + '」' };
-        }
-        const text = await IO.readAsText(f);
-        if (/<tmx[\s>]/i.test(text.slice(0, 400))) {
-          const { tus } = IO.parseTMX(text);
-          return { pairs: tus.map(tu => ({ zh: tu.src, en: tu.tgt })), note: 'TMX' };
-        }
-        if (/\.jsonl$/i.test(f.name)) {
-          const { rows, errors } = IO.parseJSONLVerbose(text);
-          const good = rows.filter(o => o.zh && o.en).map(o => ({ zh: o.zh, en: o.en }));
-          const badCount = rows.length - good.length + errors.length;
-          const note = badCount > 0 ? `JSONL（成功 ${good.length}，跳过 ${badCount} 行）` : 'JSONL';
-          return { pairs: good, note };
-        }
-        const { header, rows, mapping } = IO.sniffBilingualTable(text);
-        return { pairs: rows.map(r => ({ zh: String(r[mapping.src] || ''), en: String(r[mapping.tgt] || '') })), note: 'CSV/TSV' };
-      });
-    }
+    /* ---- 导入修订（审校留痕）：解析在 js/revimport.js（可无头测试），这里只做编排 ---- */
 
     let revPending = null;
     let revParseGeneration = 0;
@@ -1441,7 +1376,7 @@
       const segmentSnapshot = JSON.stringify(state.segments);
       $('#revPreview').innerHTML = '<div class="empty">解析并匹配中…</div>';
       try {
-        const { pairs, note, comments, meta } = await revParsePairs(f);
+        const { pairs, note, comments, meta } = await RevImport.parseFile(f);
         if (generation !== revParseGeneration) return;
         if (project !== state.project || segmentSnapshot !== JSON.stringify(state.segments)) throw new Error('工作区已变化，请重新选择修订文件。');
         const { plan, comments: mappedComments, matched, revised, unchanged, fresh } = window.MiniCatRevision.buildPlan(state.segments, pairs, comments);
@@ -1578,7 +1513,7 @@
             const zhParas = parsed.paragraphs.filter(p2 => p2.trim() && /[\u4e00-\u9fff]/.test(p2));
             parsedSets.push({ name: m.name, enList: enParas, zhList: zhParas.length > 2 ? zhParas : null, hasZh: zhParas.length > 2 });
           } else {
-            const { pairs } = await revParsePairs(m.file);
+            const { pairs } = await RevImport.parseFile(m.file);
             const enList = [], zhList = [];
             for (const p of pairs) {
               const z = (p.zh || '').trim(), e = (p.en || '').trim();

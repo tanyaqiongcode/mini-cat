@@ -138,7 +138,6 @@
 
   // §8.1 术语表一致性（weight 最高：每处缺失扣 12）
   function checkTermbase(source, text, terms, flags) {
-    const lower = text.toLowerCase();
     const seen = new Set();
     for (const t of terms || []) {
       if (!t.zh || !t.en) continue;

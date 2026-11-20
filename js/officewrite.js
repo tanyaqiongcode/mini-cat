@@ -282,7 +282,7 @@
     let wbSheets = '', wbRels = '', ctOverrides = '';
     sheets.forEach((sh, i) => {
       const id = i + 1;
-      wbSheets += `<sheet name="${esc(sh.name).replace(/[\[\]\*\?\/\\:]/g, '_').slice(0, 31)}" sheetId="${id}" r:id="rId${id}"/>`;
+      wbSheets += `<sheet name="${esc(sh.name).replace(/[[\]*?/\\:]/g, '_').slice(0, 31)}" sheetId="${id}" r:id="rId${id}"/>`;
       wbRels += `<Relationship Id="rId${id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${id}.xml"/>`;
       ctOverrides += `<Override PartName="/xl/worksheets/sheet${id}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`;
       entries.push({ name: `xl/worksheets/sheet${id}.xml`, data: utf8(sheetXml(sh.rows)) });

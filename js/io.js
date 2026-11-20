@@ -66,6 +66,10 @@
 
   function csvCell(v, delim) {
     v = String(v == null ? '' : v);
+    // Excel/LibreOffice 公式注入防护（OWASP）：以 = + @ 或制表/回车开头的单元格加 ' 前缀
+    // （CSV 与 TSV 同一导出路径，见 SECURITY.md）。刻意不防护 '-'：句段/译文常以
+    // "- " 开头（破折号对白），加前缀破坏内容（残余风险记入 SECURITY.md）。
+    if (/^[=+@\t\r]/.test(v)) v = "'" + v;
     if (new RegExp(`[${delim === '\t' ? '\t' : delim}"\n\r]`).test(v)) v = '"' + v.replace(/"/g, '""') + '"';
     return v;
   }
@@ -393,7 +397,7 @@
   }
 
   const IO = {
-    readAsText, parseDelimited, buildDelimited, sniffBilingualTable, mapBilingualHeader, parseJSONLVerbose, sanitizeBackup, parseJSONLVerbose,
+    readAsText, parseDelimited, buildDelimited, sniffBilingualTable, mapBilingualHeader, parseJSONLVerbose, sanitizeBackup,
     parseTMX, buildTMX, parseTBX, buildTBX, parseJSONL, jsonlToTMRows, alignPairTexts, download
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = IO;

@@ -1,7 +1,6 @@
 /* Node tests: Word 修订模式（w:ins/w:del）与批注的自动识别。
  * 构造携带修订标记的合成 docx → docxToBlocks 解析 → 断言自动提取的作者/日期/新旧文本/批注/文件属性。 */
 const Write = require('../js/officewrite.js');
-const Zip = require('../js/zip.js');
 const Office = require('../js/msoffice.js');
 const { DOMParser } = require('linkedom');
 Office.setXmlParser(DOMParser); // Node 测试环境注入 XML 解析器（运行时零依赖不变）

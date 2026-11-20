@@ -1,5 +1,18 @@
 # 更新日志
 
+## v1.13.0（2026-11-20）
+
+**缺陷修复（外部质量审计发现项）**
+- **docx 修订导入不再抛错**：cellRuns（运行级格式）查找曾引用未定义的 `dataRow`，带加粗/斜体修订的表格导入必抛 ReferenceError、被吞成"解析失败"（v1.9 引入，恰打坏本版主打的"保留审校人格式"路径）；修正为与 rowTracked/rowComments 一致的绝对行号换算（首行自带修订时 `ri` 与 `ri+1` 分流）。`tests/revimport.test.js` 15 项回归覆盖两种行号约定 + 加粗/斜体提取。
+- **解析逻辑出闭包**：修订导入的文件解析（docx/xlsx/TMX/JSONL/CSV）从 app.js 的 bindEvents 闭包抽离为 `js/revimport.js`（UMD 双端导出），Node 无头可测、纳入 c8 统计；app.js 只保留 UI 编排，减约 60 行。
+- 清理 app.js 注释中混入的 7 行 shell 残留（AI 生成残留）；移除未使用的 TM_BANDS、`const n` 等死代码。
+
+**安全与工程化**
+- **CSV/TSV 公式注入防护**（OWASP）：以 `= + @` 或制表/回车开头的单元格加 `'` 前缀，与 multi-align 对齐（`tests/io.test.js` 8 项断言）；SECURITY.md 已知边界同步更新（`-` 开头刻意不防护，理由写入注释与 SECURITY.md）。
+- **ESLint 入 CI**：flat config 按运行环境分域（js/ 浏览器经典脚本、tests/ Node CJS + 浏览器全局、term-worker.js Worker 全局、vendored term-engine.js 豁免）；lint job 进 ci.yml；`scripts/bundle-term-engine.cjs` 纳入 commonjs 域。
+- 顺带修复 lint 揭示的历史问题：io.js 导出对象重复键 `parseJSONLVerbose`、officewrite.js 工作表名清洗正则的 4 处多余转义。
+- 缓存版本戳 `?v=1.13`，package.json 1.13.0。
+
 ## v1.12.0（2026-09-29）
 
 **代码质量（审查项）**

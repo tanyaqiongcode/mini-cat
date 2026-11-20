@@ -68,9 +68,9 @@ async function previewTests() {
     '#revPreview': {}, '#revAuthor': { value: '' }, '#revLabel': { value: '' }, '#btnRevCommit': { disabled: true }
   };
   const state = { project: 'P', segments: [{ src: '乙段', tgt: 'middle' }] };
-  const setup = new Function('$', 'state', 'Core', 'Diff', 'esc', 'window', 'revParsePairs',
+  const setup = new Function('$', 'state', 'Core', 'Diff', 'esc', 'window', 'RevImport',
     code.slice(begin, end) + '\nreturn () => revPending;');
-  const pending = setup(s => elements[s], state, Core, Diff, Core.escapeHtml, { MiniCatRevision: Revision }, f => f.parse());
+  const pending = setup(s => elements[s], state, Core, Diff, Core.escapeHtml, { MiniCatRevision: Revision }, { parseFile: f => f.parse() });
   const choose = f => { elements['#revFile'].files = [f]; return elements['#revFile'].onchange(); };
   const good = { name: 'good.docx', parse: async () => ({ pairs: [{ zh: '乙段', en: 'middle' }], comments: [{ pairIndex: 0, text: 'note' }], note: 'docx' }) };
   await choose(good);
